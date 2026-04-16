@@ -6,13 +6,22 @@
 --]]
 
 local check_version = function()
-  local verstr = tostring(vim.version())
-  if not vim.version.ge then
-    vim.health.error(string.format("Neovim out of date: '%s'. Upgrade to latest stable or nightly", verstr))
+  local v = vim.version()
+  if not v then
+    vim.health.warn("Could not determine Neovim version")
     return
   end
 
-  if vim.version.ge(vim.version(), '0.10-dev') then
+  local verstr = string.format("%d.%d.%d", v.major or 0, v.minor or 0, v.patch or 0)
+
+  local is_at_least_010 = false
+  if (v.major or 0) > 0 then
+    is_at_least_010 = true
+  elseif (v.major or 0) == 0 and (v.minor or 0) >= 10 then
+    is_at_least_010 = true
+  end
+
+  if is_at_least_010 then
     vim.health.ok(string.format("Neovim version is: '%s'", verstr))
   else
     vim.health.error(string.format("Neovim out of date: '%s'. Upgrade to latest stable or nightly", verstr))
